@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rifa Online</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg-primary: #ffffff;
+      --bg-secondary: #f5f5f4;
+      --bg-tertiary: #f0efed;
+      --bg-success: #f0fdf4;
+      --bg-warning: #fffbeb;
+      --bg-danger: #fef2f2;
+      --text-primary: #1c1c1a;
+      --text-secondary: #6b7280;
+      --text-tertiary: #9ca3af;
+      --text-success: #166534;
+      --text-warning: #92400e;
+      --text-danger: #991b1b;
+      --border: rgba(0,0,0,0.12);
+      --border-md: rgba(0,0,0,0.22);
+      --border-success: #bbf7d0;
+      --border-warning: #fde68a;
+      --border-danger: #fecaca;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-xl: 16px;
+      --font: -apple-system, 'Segoe UI', sans-serif;
+      --font-mono: 'Courier New', monospace;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg-primary: #1c1c1a;
+        --bg-secondary: #27272a;
+        --bg-tertiary: #18181b;
+        --bg-success: #052e16;
+        --bg-warning: #1c1007;
+        --bg-danger: #1f0a0a;
+        --text-primary: #f4f4f5;
+        --text-secondary: #a1a1aa;
+        --text-tertiary: #71717a;
+        --text-success: #86efac;
+        --text-warning: #fcd34d;
+        --text-danger: #fca5a5;
+        --border: rgba(255,255,255,0.10);
+        --border-md: rgba(255,255,255,0.18);
+        --border-success: #166534;
+        --border-warning: #92400e;
+        --border-danger: #991b1b;
+      }
+    }
+
+    body { font-family: var(--font); background: var(--bg-tertiary); color: var(--text-primary); min-height: 100vh; }
+
+    /* NAV */
+    .tabs { display: flex; gap: 4px; padding: 12px 16px; background: var(--bg-primary); border-bottom: 0.5px solid var(--border); position: sticky; top: 0; z-index: 100; }
+    .tab { padding: 8px 18px; border-radius: var(--radius-md); border: 0.5px solid var(--border); background: transparent; cursor: pointer; font-size: 14px; color: var(--text-secondary); font-family: var(--font); transition: all 0.15s; }
+    .tab.active { background: var(--bg-secondary); color: var(--text-primary); border-color: var(--border-md); font-weight: 500; }
+
+    /* PAGES */
+    .page { display: none; padding: 20px 16px; max-width: 680px; margin: 0 auto; }
+    .page.active { display: block; }
+
+    /* CARDS */
+    .card { background: var(--bg-primary); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 20px; margin-bottom: 12px; }
+    .card-title { font-size: 15px; font-weight: 500; margin-bottom: 14px; }
+
+    /* FORMS */
+    label { display: block; font-size: 13px; color: var(--text-secondary); margin-bottom: 5px; margin-top: 14px; }
+    label:first-child { margin-top: 0; }
+    input[type=text], input[type=number], input[type=password], input[type=file], textarea {
+      width: 100%; padding: 9px 12px; border: 0.5px solid var(--border-md);
+      border-radius: var(--radius-md); background: var(--bg-primary); color: var(--text-primary);
+      font-size: 14px; font-family: var(--font); outline: none; transition: border-color 0.15s;
+    }
+    input:focus, textarea:focus { border-color: var(--text-primary); }
+    textarea { resize: vertical; min-height: 72px; }
+
+    /* BUTTONS */
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 9px 18px; border-radius: var(--radius-md); border: 0.5px solid var(--border-md); background: transparent; color: var(--text-primary); font-size: 13px; font-family: var(--font); cursor: pointer; transition: background 0.12s; }
+    .btn:hover { background: var(--bg-secondary); }
+    .btn-primary { background: var(--text-primary); color: var(--bg-primary); border-color: var(--text-primary); }
+    .btn-primary:hover { opacity: 0.85; }
+    .btn-success { color: var(--text-success); border-color: var(--border-success); }
+    .btn-success:hover { background: var(--bg-success); }
+    .btn-danger { color: var(--text-danger); border-color: var(--border-danger); }
+    .btn-danger:hover { background: var(--bg-danger); }
+    .btn-sm { padding: 5px 12px; font-size: 12px; }
+    .btn-full { width: 100%; }
+
+    /* PROMO BUTTONS */
+    .qty-input-row { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+    .qty-input-row input { width: 90px; flex-shrink: 0; font-size: 20px; font-weight: 500; text-align: center; padding: 10px 8px; }
+    .qty-summary { flex: 1; }
+    .qty-summary .qs-total { font-size: 18px; font-weight: 500; color: var(--text-success); }
+    .qty-summary .qs-each  { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+    .promo-banners { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+    .promo-banner { display: flex; align-items: center; justify-content: space-between; padding: 9px 12px; border-radius: var(--radius-md); border: 0.5px solid var(--border); background: var(--bg-secondary); font-size: 13px; transition: all 0.15s; }
+    .promo-banner.active-promo { border-color: var(--text-success); background: var(--bg-success); }
+    .promo-banner .pb-left { color: var(--text-secondary); }
+    .promo-banner .pb-left strong { color: var(--text-primary); }
+    .promo-banner .pb-disc { font-size: 12px; font-weight: 500; color: var(--text-success); background: var(--bg-success); border: 0.5px solid var(--border-success); padding: 2px 8px; border-radius: 20px; }
+    .promo-banner.active-promo .pb-left { color: var(--text-success); }
+    .promo-banner.active-promo .pb-left strong { color: var(--text-success); }
+
+    /* NUMBERS DISPLAY (pills) */
+    .nums-display { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; }
+    .num-pill { background: var(--text-primary); color: var(--bg-primary); border-radius: var(--radius-md); padding: 8px 14px; font-size: 18px; font-weight: 500; font-family: var(--font-mono); letter-spacing: 1px; }
+
+    /* RIFA IMAGE */
+    .rifa-img { width: 100%; aspect-ratio: 16/7; object-fit: cover; border-radius: var(--radius-lg); display: block; margin-bottom: 12px; }
+    .rifa-img-placeholder { width: 100%; aspect-ratio: 16/7; border-radius: var(--radius-lg); background: var(--bg-secondary); display: flex; align-items: center; justify-content: center; font-size: 13px; color: var(--text-tertiary); margin-bottom: 12px; }
+
+    /* PARTICIPANTS */
+    .participant-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 12px 0; border-bottom: 0.5px solid var(--border); }
+    .participant-row:last-child { border-bottom: none; }
+    .p-name { font-size: 14px; font-weight: 500; }
+    .p-detail { font-size: 12px; color: var(--text-secondary); margin-top: 3px; }
+    .badge { display: inline-block; font-size: 11px; font-weight: 500; padding: 3px 9px; border-radius: 20px; margin-top: 5px; }
+    .badge-pending   { background: var(--bg-warning); color: var(--text-warning); }
+    .badge-confirmed { background: var(--bg-success);  color: var(--text-success); }
+    .badge-expired   { background: var(--bg-secondary); color: var(--text-tertiary); }
+    .p-actions { display: flex; gap: 6px; flex-shrink: 0; }
+
+    /* STATS */
+    .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 14px; }
+    .stat-card { background: var(--bg-secondary); border-radius: var(--radius-md); padding: 12px; }
+    .stat-num { font-size: 22px; font-weight: 500; }
+    .stat-lbl { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+
+    /* PIX */
+    .pix-box { background: var(--bg-secondary); border-radius: var(--radius-md); padding: 14px; border: 0.5px solid var(--border); margin: 10px 0; }
+    .pix-key { font-family: var(--font-mono); font-size: 15px; word-break: break-all; margin-top: 4px; cursor: pointer; }
+
+    /* PROMO EDITOR */
+    .promo-editor { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .promo-field { background: var(--bg-secondary); border-radius: var(--radius-md); padding: 12px; }
+    .promo-field .pf-label { font-size: 12px; font-weight: 500; color: var(--text-secondary); margin-bottom: 4px; }
+    .promo-field label { margin-top: 8px; }
+    .promo-field label:first-of-type { margin-top: 0; }
+    .promo-field input { background: var(--bg-primary); font-size: 13px; padding: 6px 8px; }
+    @media (max-width: 480px) { .promo-editor { grid-template-columns: 1fr; } }
+
+    /* MODAL */
+    .modal-backdrop { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.48); z-index: 200; align-items: center; justify-content: center; padding: 16px; }
+    .modal-backdrop.open { display: flex; }
+    .modal { background: var(--bg-primary); border-radius: var(--radius-xl); padding: 22px; width: 100%; max-width: 440px; border: 0.5px solid var(--border); max-height: 90vh; overflow-y: auto; }
+    .modal h3 { font-size: 17px; font-weight: 500; margin-bottom: 14px; }
+    .modal-footer { display: flex; gap: 8px; justify-content: flex-end; margin-top: 18px; }
+
+    /* LOGIN / SETUP */
+    .center-wrap { max-width: 380px; margin: 60px auto; padding: 0 16px; }
+    .center-wrap h2 { font-size: 20px; font-weight: 500; margin-bottom: 6px; }
+    .center-wrap p { font-size: 13px; color: var(--text-secondary); margin-bottom: 20px; }
+    .err-msg { color: var(--text-danger); font-size: 13px; margin-top: 8px; min-height: 20px; }
+
+    /* MISC */
+    .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: var(--text-primary); color: var(--bg-primary); padding: 10px 20px; border-radius: var(--radius-md); font-size: 13px; z-index: 999; opacity: 0; pointer-events: none; white-space: nowrap; transition: opacity 0.2s; }
+    .toast.show { opacity: 1; }
+    .muted { color: var(--text-secondary); font-size: 13px; }
+    .flex-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    hr { border: none; border-top: 0.5px solid var(--border); margin: 16px 0; }
+    .empty-state { text-align: center; padding: 2rem; color: var(--text-tertiary); font-size: 14px; }
+    .no-rifa { text-align: center; padding: 4rem 1rem; }
+    .no-rifa h2 { font-size: 20px; font-weight: 500; color: var(--text-secondary); margin-bottom: 8px; }
+    .rifas-list { display: flex; flex-direction: column; gap: 6px; }
+    .rifa-row { display: flex; align-items: center; justify-content: space-between; padding: 12px; border-radius: var(--radius-md); border: 0.5px solid var(--border); background: var(--bg-primary); }
+    .rifa-row.is-active { border-color: var(--text-primary); border-width: 1.5px; }
+  </style>
+</head>
+<body>
+
+<div id="root"></div>
+
+<!-- Modal multipropósito -->
+<div class="modal-backdrop" id="modal-main">
+  <div class="modal">
+    <h3 id="modal-title"></h3>
+    <div id="modal-body"></div>
+    <div class="modal-footer" id="modal-footer"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ─── STATE ─────────────────────────────────────────────────────────────────────
+let S = JSON.parse(localStorage.getItem('rifaApp_v1') || 'null') || {
+  adminPwd: null,
+  rifas: [],
+  currentRifa: null,
+  participants: []
+};
+let adminIn  = false;
+let selQty   = 1;
+let pendingR = null;
+let curTab   = 'publico';
+
+function save() { localStorage.setItem('rifaApp_v1', JSON.stringify(S)); }
+function fmt(v) { return 'R$\u00a0' + Number(v).toFixed(2).replace('.', ','); }
+
+// ─── TOAST ─────────────────────────────────────────────────────────────────────
+function toast(msg, dur = 2800) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), dur);
+}
+
+// ─── MODAL ─────────────────────────────────────────────────────────────────────
+function openModal()  { document.getElementById('modal-main').classList.add('open'); }
+function closeModal() { document.getElementById('modal-main').classList.remove('open'); }
+function setModal(title, body, footer) {
+  document.getElementById('modal-title').textContent  = title;
+  document.getElementById('modal-body').innerHTML     = body;
+  document.getElementById('modal-footer').innerHTML   = footer;
+}
+
+// ─── HELPERS ───────────────────────────────────────────────────────────────────
+function isExpired(p) {
+  return p.status !== 'confirmado' && Date.now() > p.expiresAt;
+}
+
+function rifaParts(rifaId) {
+  return S.participants.filter(p => p.rifaId === rifaId);
+}
+
+// Números atualmente ocupados (confirmados + reservas ainda válidas)
+function takenNums(rifaId) {
+  const t = new Set();
+  rifaParts(rifaId).forEach(p => {
+    if (p.status === 'confirmado' || (p.status === 'pendente' && !isExpired(p)))
+      p.numeros.forEach(n => t.add(n));
+  });
+  return t;
+}
+
+// Gera `qty` números aleatórios dentre os disponíveis
+function randNums(qty, max, taken) {
+  const avail = [];
+  for (let i = 1; i <= max; i++) if (!taken.has(i)) avail.push(i);
+  if (avail.length < qty) return null;
+  // Fisher-Yates shuffle
+  for (let i = avail.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [avail[i], avail[j]] = [avail[j], avail[i]];
+  }
+  return avail.slice(0, qty);
+}
+
+// Monta lista de promoções a partir da rifa
+function getPromos(rifa) {
+  const b = Number(rifa.preco) || 0;
+  const list = [{ qty: 1, total: b, disc: 0, label: 'unitária' }];
+  (rifa.promos || []).forEach(p => {
+    const qty = Number(p.qtd), disc = Number(p.desconto);
+    if (qty >= 2 && disc >= 1 && disc <= 99) {
+      const each  = +(b * (1 - disc / 100)).toFixed(2);
+      const total = +(each * qty).toFixed(2);
+      list.push({ qty, total, disc, label: `-${disc}%` });
+    }
+  });
+  return list.sort((a, b) => a.qty - b.qty);
+}
+
+function copyText(text, msg) {
+  navigator.clipboard.writeText(text).then(() => toast(msg)).catch(() => toast('Copie manualmente: ' + text));
+}
+
+// ─── RENDER ROOT ───────────────────────────────────────────────────────────────
+function render() {
+  if (!S.adminPwd) { renderSetup(); return; }
+  renderApp();
+}
+
+// ─── SETUP (primeiro acesso — criar senha) ─────────────────────────────────────
+function renderSetup() {
+  document.getElementById('root').innerHTML = `
+    <div class="center-wrap">
+      <div class="card">
+        <h2>Bem-vindo!</h2>
+        <p>Antes de começar, crie uma senha para proteger o painel de administração.</p>
+        <label>Senha do admin</label>
+        <input type="password" id="s-p1" placeholder="Mínimo 4 caracteres" autofocus />
+        <label>Confirmar senha</label>
+        <input type="password" id="s-p2" placeholder="Repita a senha"
+          onkeydown="if(event.key==='Enter')doSetup()" />
+        <div style="margin-top:16px;">
+          <button class="btn btn-primary btn-full" onclick="doSetup()">Criar senha e entrar</button>
+        </div>
+        <div class="err-msg" id="s-err"></div>
+      </div>
+    </div>`;
+}
+
+function doSetup() {
+  const p1  = document.getElementById('s-p1').value;
+  const p2  = document.getElementById('s-p2').value;
+  const err = document.getElementById('s-err');
+  if (p1.length < 4) { err.textContent = 'Mínimo 4 caracteres.'; return; }
+  if (p1 !== p2)     { err.textContent = 'Senhas não coincidem.'; return; }
+  S.adminPwd = btoa(unescape(encodeURIComponent(p1)));
+  save(); adminIn = true; renderApp();
+}
+
+// ─── APP SHELL (tabs) ──────────────────────────────────────────────────────────
+function renderApp() {
+  document.getElementById('root').innerHTML = `
+    <div class="tabs">
+      <button class="tab${curTab==='publico'?' active':''}" onclick="switchTab('publico')">🎟 Rifa</button>
+      <button class="tab${curTab==='admin'  ?' active':''}" onclick="switchTab('admin')">⚙️ Admin</button>
+    </div>
+    <div id="page-publico" class="page${curTab==='publico'?' active':''}"></div>
+    <div id="page-admin"   class="page${curTab==='admin'  ?' active':''}"></div>`;
+
+  if (curTab === 'publico') renderPublico();
+  else renderAdminGate();
+}
+
+function switchTab(tab) {
+  curTab = tab;
+  document.querySelectorAll('.tab').forEach((b, i) =>
+    b.classList.toggle('active', ['publico','admin'][i] === tab));
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + tab).classList.add('active');
+  if (tab === 'publico') renderPublico();
+  else renderAdminGate();
+}
+
+// ─── ADMIN GATE (login) ────────────────────────────────────────────────────────
+function renderAdminGate() {
+  if (adminIn) { renderAdmin(); return; }
+  document.getElementById('page-admin').innerHTML = `
+    <div class="center-wrap">
+      <div class="card">
+        <h2>Área restrita</h2>
+        <p>Digite a senha de administração para continuar.</p>
+        <label>Senha</label>
+        <input type="password" id="l-pwd" placeholder="Sua senha"
+          onkeydown="if(event.key==='Enter')doLogin()" autofocus />
+        <div style="margin-top:12px;">
+          <button class="btn btn-primary btn-full" onclick="doLogin()">Entrar</button>
+        </div>
+        <div class="err-msg" id="l-err"></div>
+      </div>
+    </div>`;
+  setTimeout(() => document.getElementById('l-pwd')?.focus(), 60);
+}
+
+function doLogin() {
+  const v = document.getElementById('l-pwd')?.value || '';
+  if (btoa(unescape(encodeURIComponent(v))) === S.adminPwd) {
+    adminIn = true; renderAdmin();
+  } else {
+    document.getElementById('l-err').textContent = 'Senha incorreta.';
+  }
+}
+
+function logout() { adminIn = false; curTab = 'publico'; render(); }
+
+// ─── PÁGINA PÚBLICA ────────────────────────────────────────────────────────────
+function renderPublico() {
+  const el   = document.getElementById('page-publico');
+  const rifa = S.rifas.find(r => r.id === S.currentRifa) || S.rifas[0];
+
+  if (!rifa) {
+    el.innerHTML = `<div class="no-rifa">
+      <h2>Nenhuma rifa ativa</h2>
+      <p class="muted">Em breve! Volte aqui em instantes.</p>
+    </div>`;
+    return;
+  }
+
+  const promos = getPromos(rifa);
+
+  el.innerHTML = `
+    ${rifa.imgData
+      ? `<img class="rifa-img" src="${rifa.imgData}" alt="${rifa.nome}" />`
+      : `<div class="rifa-img-placeholder">Sem foto cadastrada</div>`}
+
+    <div class="card">
+      <div style="font-size:21px;font-weight:500;margin-bottom:5px;">${rifa.nome}</div>
+      ${rifa.descricao ? `<p class="muted" style="margin-bottom:10px;">${rifa.descricao}</p>` : ''}
+      <div class="muted">Cota unitária: <strong style="color:var(--text-primary);">${fmt(rifa.preco)}</strong></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Quantas cotas você quer?</div>
+      <div class="qty-input-row">
+        <input type="number" id="b-qty" value="${selQty}" min="1" max="${rifa.numeros}"
+          oninput="atualizarResumo(${rifa.id})" onchange="atualizarResumo(${rifa.id})" />
+        <div class="qty-summary">
+          <div class="qs-total" id="qs-total">${fmt(calcTotal(rifa, selQty))}</div>
+          <div class="qs-each"  id="qs-each">${descrPreco(rifa, selQty)}</div>
+        </div>
+      </div>
+      ${promos.filter(p => p.qty > 1).length > 0 ? `
+      <p class="muted" style="font-size:12px;margin-bottom:8px;">Promoções disponíveis:</p>
+      <div class="promo-banners" id="promo-banners">
+        ${promos.filter(p => p.qty > 1).map(p => `
+          <div class="promo-banner${selQty >= p.qty ? ' active-promo' : ''}" id="pb-${p.qty}">
+            <span class="pb-left">A partir de <strong>${p.qty} cotas</strong></span>
+            <span class="pb-disc">-${p.disc}% de desconto</span>
+          </div>`).join('')}
+      </div>` : ''}
+      <p class="muted" style="font-size:12px;">
+        Seus números serão gerados automaticamente ao confirmar.
+      </p>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Seus dados</div>
+      <label>Nome completo</label>
+      <input type="text" id="b-nome" placeholder="Ex: Maria Silva" />
+      <label>WhatsApp</label>
+      <input type="text" id="b-wa" placeholder="(11) 99999-9999" />
+      <div style="margin-top:16px;">
+        <button class="btn btn-primary btn-full" onclick="abrirCompra(${rifa.id})">
+          Gerar meus números
+        </button>
+      </div>
+    </div>`;
+}
+
+// Calcula desconto aplicável para a qty digitada
+function descontoParaQty(rifa, qty) {
+  const promos = getPromos(rifa).filter(p => p.qty > 1 && qty >= p.qty);
+  if (!promos.length) return 0;
+  return Math.max(...promos.map(p => p.disc));
+}
+
+function calcTotal(rifa, qty) {
+  const b    = Number(rifa.preco) || 0;
+  const disc = descontoParaQty(rifa, qty);
+  return +(b * qty * (1 - disc / 100)).toFixed(2);
+}
+
+function descrPreco(rifa, qty) {
+  const b    = Number(rifa.preco) || 0;
+  const disc = descontoParaQty(rifa, qty);
+  if (disc > 0) {
+    const each = +(b * (1 - disc / 100)).toFixed(2);
+    return `${fmt(each)}/cota · ${disc}% de desconto aplicado`;
+  }
+  return qty > 1 ? `${fmt(b)}/cota · sem desconto` : `${fmt(b)}/cota`;
+}
+
+function atualizarResumo(rifaId) {
+  const rifa = S.rifas.find(r => r.id === rifaId);
+  const qty  = Math.max(1, parseInt(document.getElementById('b-qty')?.value) || 1);
+  selQty = qty;
+
+  const totalEl = document.getElementById('qs-total');
+  const eachEl  = document.getElementById('qs-each');
+  if (totalEl) totalEl.textContent = fmt(calcTotal(rifa, qty));
+  if (eachEl)  eachEl.textContent  = descrPreco(rifa, qty);
+
+  // Atualiza highlight dos banners de promoção
+  const promos = getPromos(rifa).filter(p => p.qty > 1);
+  promos.forEach(p => {
+    const el = document.getElementById('pb-' + p.qty);
+    if (el) el.classList.toggle('active-promo', qty >= p.qty);
+  });
+}
+
+function abrirCompra(rifaId) {
+  const nome = (document.getElementById('b-nome')?.value || '').trim();
+  const wa   = (document.getElementById('b-wa')?.value  || '').trim();
+  const qty  = Math.max(1, parseInt(document.getElementById('b-qty')?.value) || 1);
+  if (!nome || !wa) { toast('Preencha nome e WhatsApp'); return; }
+
+  const rifa  = S.rifas.find(r => r.id === rifaId);
+  const taken = takenNums(rifaId);
+  const nums  = randNums(qty, rifa.numeros, taken);
+
+  if (!nums) {
+    toast('Números insuficientes disponíveis. Tente uma quantidade menor.');
+    return;
+  }
+
+  const total = calcTotal(rifa, qty);
+  const disc  = descontoParaQty(rifa, qty);
+  pendingR = { rifaId, nome, wa, nums, total };
+
+  setModal(
+    'Confirmar reserva',
+    `<p class="muted" style="margin-bottom:12px;">
+       Seus números para <strong>${nome}</strong>:
+     </p>
+     <div class="nums-display">
+       ${nums.map(n => `<span class="num-pill">${String(n).padStart(2,'0')}</span>`).join('')}
+     </div>
+     <p style="font-size:14px;margin-top:14px;">
+       Total: <strong style="color:var(--text-success);">${fmt(total)}</strong>
+       ${disc > 0 ? `<span class="muted" style="font-size:12px;margin-left:6px;">(${disc}% de desconto aplicado)</span>` : ''}
+     </p>
+     <p class="muted" style="margin-top:10px;font-size:12px;">
+       Estes números ficam reservados por <strong>30 minutos</strong>.
+       Confirme e pague via PIX para garantir sua participação.
+     </p>`,
+    `<button class="btn" onclick="closeModal()">Cancelar</button>
+     <button class="btn btn-primary" onclick="confirmarReserva()">Reservar agora</button>`
+  );
+  openModal();
+}
+
+function confirmarReserva() {
+  if (!pendingR) return;
+  const rifa  = S.rifas.find(r => r.id === pendingR.rifaId);
+  const taken = takenNums(pendingR.rifaId);
+
+  // Verificação de corrida: checar se algum número foi tomado entre a geração e a confirmação
+  if (pendingR.nums.some(n => taken.has(n))) {
+    toast('Alguns números já foram reservados. Tente novamente.');
+    closeModal(); pendingR = null; return;
+  }
+
+  const p = {
+    id: Date.now(),
+    rifaId: pendingR.rifaId,
+    nome: pendingR.nome,
+    wa: pendingR.wa,
+    numeros: pendingR.nums,
+    total: pendingR.total,
+    status: 'pendente',
+    criadoEm: Date.now(),
+    expiresAt: Date.now() + 30 * 60 * 1000
+  };
+  S.participants.push(p);
+  save();
+  closeModal();
+
+  const pixEscaped = (rifa.pix || '').replace(/'/g, "\\'");
+  setModal(
+    'Pague via PIX',
+    `<p class="muted" style="margin-bottom:10px;">
+       Seus números estão reservados por <strong>30 minutos</strong>!
+     </p>
+     <div class="nums-display" style="margin-bottom:14px;">
+       ${p.numeros.map(n => `<span class="num-pill">${String(n).padStart(2,'0')}</span>`).join('')}
+     </div>
+     <div class="pix-box">
+       <div class="muted" style="margin-bottom:4px;">
+         Chave PIX <span style="font-size:11px;">(toque para copiar)</span>
+       </div>
+       <div class="pix-key" onclick="copyText('${pixEscaped}','Chave PIX copiada!')">
+         ${rifa.pix || '(não cadastrada)'}
+       </div>
+     </div>
+     <p class="muted" style="margin-top:12px;font-size:13px;">
+       Valor: <strong style="color:var(--text-success);">${fmt(p.total)}</strong><br><br>
+       Após pagar, envie o comprovante via WhatsApp para
+       <strong>${rifa.wa || '(não cadastrado)'}</strong> informando seu nome.
+     </p>`,
+    `<button class="btn btn-primary" onclick="closeModal()">Entendido!</button>`
+  );
+  openModal();
+  pendingR = null;
+}
+
+// ─── PAINEL ADMIN ──────────────────────────────────────────────────────────────
+function renderAdmin() {
+  const el    = document.getElementById('page-admin');
+  const cur   = S.rifas.find(r => r.id === S.currentRifa);
+  const parts = cur ? rifaParts(cur.id) : [];
+  const conf  = parts.filter(p => p.status === 'confirmado');
+  const pend  = parts.filter(p => p.status === 'pendente' && !isExpired(p));
+  const total = conf.reduce((s, p) => s + p.total, 0);
+
+  el.innerHTML = `
+    <div class="flex-row" style="justify-content:flex-end;margin-bottom:4px;">
+      <button class="btn btn-sm btn-danger" onclick="logout()">Sair</button>
+    </div>
+
+    <!-- CRIAR RIFA -->
+    <div class="card">
+      <div class="card-title">Criar nova rifa</div>
+      <label>Nome da rifa</label>
+      <input type="text" id="a-nome" placeholder="Ex: Rifa Kit Capilar" />
+      <label>Descrição do prêmio</label>
+      <textarea id="a-desc" placeholder="O que o ganhador vai receber..."></textarea>
+      <label>Foto do produto</label>
+      <input type="file" id="a-img" accept="image/*" />
+      <label>Preço por cota (R$)</label>
+      <input type="number" id="a-preco" placeholder="10.00" min="0.01" step="0.01" />
+      <label>Quantidade total de números</label>
+      <input type="number" id="a-nums" value="100" min="10" max="9999" />
+      <label>Chave PIX</label>
+      <input type="text" id="a-pix" placeholder="CPF, e-mail ou telefone" />
+      <label>WhatsApp para receber comprovantes</label>
+      <input type="text" id="a-wa" placeholder="(11) 99999-9999" />
+
+      <hr />
+      <div class="card-title" style="margin-bottom:8px;">Promoções</div>
+      <p class="muted" style="margin-bottom:12px;font-size:12px;">
+        Configure descontos para compra de múltiplas cotas. Deixe em branco para desativar.
+      </p>
+      <div class="promo-editor">
+        ${[{q:3,d:10},{q:6,d:18},{q:10,d:25}].map((p, i) => `
+          <div class="promo-field">
+            <div class="pf-label">Promoção ${i+1}</div>
+            <label>Cotas</label>
+            <input type="number" id="np-q${i}" value="${p.q}" min="2" max="999" />
+            <label>Desconto %</label>
+            <input type="number" id="np-d${i}" value="${p.d}" min="1" max="99" />
+          </div>`).join('')}
+      </div>
+      <div style="margin-top:16px;">
+        <button class="btn btn-primary" onclick="criarRifa()">Criar rifa</button>
+      </div>
+    </div>
+
+    <!-- LISTA DE RIFAS -->
+    ${S.rifas.length > 0 ? `
+    <div class="card">
+      <div class="card-title">Minhas rifas</div>
+      <div class="rifas-list">
+        ${S.rifas.map(r => `
+          <div class="rifa-row${r.id === S.currentRifa ? ' is-active' : ''}">
+            <div>
+              <div style="font-size:14px;font-weight:500;">${r.nome}</div>
+              <div class="muted">${fmt(r.preco)}/cota · ${r.numeros} números</div>
+            </div>
+            <div class="flex-row">
+              <button class="btn btn-sm" onclick="openEditPromos(${r.id})">Promoções</button>
+              <button class="btn btn-sm${r.id === S.currentRifa ? ' btn-primary' : ''}"
+                onclick="ativarRifa(${r.id})">
+                ${r.id === S.currentRifa ? 'Ativa' : 'Ativar'}
+              </button>
+            </div>
+          </div>`).join('')}
+      </div>
+    </div>` : ''}
+
+    <!-- PAINEL DA RIFA ATIVA -->
+    ${cur ? `
+    <div class="card">
+      <div class="card-title">Painel: ${cur.nome}</div>
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-num">${conf.length}</div>
+          <div class="stat-lbl">Confirmados</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">${pend.length}</div>
+          <div class="stat-lbl">Pendentes</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" style="font-size:15px;">${fmt(total)}</div>
+          <div class="stat-lbl">Arrecadado</div>
+        </div>
+      </div>
+      <a href="sorteio.html" target="_blank" class="btn btn-success btn-full" style="text-decoration:none;margin-top:4px;">
+        🎰 Abrir sorteio ao vivo
+      </a>
+    </div>
+
+    <!-- PARTICIPANTES -->
+    <div class="card">
+      <div class="card-title">Participantes</div>
+      ${parts.length === 0
+        ? '<div class="empty-state">Nenhum participante ainda</div>'
+        : parts.sort((a, b) => b.criadoEm - a.criadoEm).map(p => {
+            const exp = isExpired(p);
+            const sc  = p.status === 'confirmado' ? 'badge-confirmed' : exp ? 'badge-expired' : 'badge-pending';
+            const sl  = p.status === 'confirmado' ? 'Confirmado' : exp ? 'Expirado' : 'Aguardando pagamento';
+            return `
+              <div class="participant-row">
+                <div>
+                  <div class="p-name">${p.nome}</div>
+                  <div class="p-detail">
+                    Números: ${p.numeros.map(n => String(n).padStart(2,'0')).join(', ')}
+                  </div>
+                  <div class="p-detail">${p.wa} · ${fmt(p.total)}</div>
+                  <span class="badge ${sc}">${sl}</span>
+                </div>
+                <div class="p-actions">
+                  ${p.status === 'pendente' && !exp
+                    ? `<button class="btn btn-sm btn-success" onclick="confirmarPgto(${p.id})" title="Confirmar pagamento">✓</button>`
+                    : ''}
+                  <button class="btn btn-sm btn-danger" onclick="remover(${p.id})" title="Remover">✕</button>
+                </div>
+              </div>`;
+          }).join('')}
+    </div>` : ''}
+
+    <!-- ALTERAR SENHA -->
+    <div class="card" style="margin-top:4px;">
+      <div class="card-title">Alterar senha de admin</div>
+      <label>Nova senha</label>
+      <input type="password" id="np1" placeholder="Mínimo 4 caracteres" />
+      <label>Confirmar</label>
+      <input type="password" id="np2" placeholder="Repita a senha" />
+      <div style="margin-top:12px;">
+        <button class="btn" onclick="alterarSenha()">Alterar senha</button>
+      </div>
+    </div>
+  `;
+}
+
+// ─── AÇÕES DO ADMIN ────────────────────────────────────────────────────────────
+function criarRifa() {
+  const nome  = (document.getElementById('a-nome')?.value || '').trim();
+  const desc  = (document.getElementById('a-desc')?.value || '').trim();
+  const preco = parseFloat(document.getElementById('a-preco')?.value);
+  const nums  = parseInt(document.getElementById('a-nums')?.value) || 100;
+  const pix   = (document.getElementById('a-pix')?.value  || '').trim();
+  const wa    = (document.getElementById('a-wa')?.value   || '').trim();
+
+  if (!nome || isNaN(preco) || preco <= 0) {
+    toast('Preencha ao menos o nome e o preço por cota');
+    return;
+  }
+
+  const promos = [];
+  for (let i = 0; i < 3; i++) {
+    const q = parseInt(document.getElementById(`np-q${i}`)?.value);
+    const d = parseInt(document.getElementById(`np-d${i}`)?.value);
+    if (q >= 2 && d >= 1 && d <= 99) promos.push({ qtd: q, desconto: d });
+  }
+
+  const rifa = { id: Date.now(), nome, descricao: desc, preco, numeros: nums, pix, wa, promos, imgData: null };
+  const imgInput = document.getElementById('a-img');
+
+  const doSave = () => {
+    S.rifas.push(rifa);
+    S.currentRifa = rifa.id;
+    save();
+    toast('Rifa criada com sucesso!');
+    renderAdmin();
+  };
+
+  if (imgInput?.files[0]) {
+    const reader = new FileReader();
+    reader.onload = e => { rifa.imgData = e.target.result; doSave(); };
+    reader.readAsDataURL(imgInput.files[0]);
+  } else {
+    doSave();
+  }
+}
+
+function ativarRifa(id) {
+  S.currentRifa = id;
+  save();
+  toast('Rifa ativada!');
+  renderAdmin();
+}
+
+function openEditPromos(rifaId) {
+  const rifa = S.rifas.find(r => r.id === rifaId);
+  const ps   = [...(rifa.promos || [{ qtd:3,desconto:10 }, { qtd:6,desconto:18 }, { qtd:10,desconto:25 }])];
+  while (ps.length < 3) ps.push({ qtd: '', desconto: '' });
+
+  setModal(
+    `Promoções — ${rifa.nome}`,
+    `<p class="muted" style="margin-bottom:14px;">
+       Deixe os campos em branco para desativar uma promoção.
+     </p>
+     <div class="promo-editor">
+       ${ps.slice(0, 3).map((p, i) => `
+         <div class="promo-field">
+           <div class="pf-label">Promoção ${i+1}</div>
+           <label>Cotas</label>
+           <input type="number" id="ep-q${i}" value="${p.qtd || ''}" min="2" max="999" placeholder="ex: 3" />
+           <label>Desconto %</label>
+           <input type="number" id="ep-d${i}" value="${p.desconto || ''}" min="1" max="99" placeholder="ex: 10" />
+         </div>`).join('')}
+     </div>`,
+    `<button class="btn" onclick="closeModal()">Cancelar</button>
+     <button class="btn btn-primary" onclick="salvarPromos(${rifaId})">Salvar</button>`
+  );
+  openModal();
+}
+
+function salvarPromos(rifaId) {
+  const rifa   = S.rifas.find(r => r.id === rifaId);
+  const promos = [];
+  for (let i = 0; i < 3; i++) {
+    const q = parseInt(document.getElementById(`ep-q${i}`)?.value);
+    const d = parseInt(document.getElementById(`ep-d${i}`)?.value);
+    if (q >= 2 && d >= 1 && d <= 99) promos.push({ qtd: q, desconto: d });
+  }
+  rifa.promos = promos;
+  save();
+  closeModal();
+  toast('Promoções atualizadas!');
+  renderAdmin();
+}
+
+function confirmarPgto(id) {
+  const p = S.participants.find(x => x.id === id);
+  if (p) {
+    p.status = 'confirmado';
+    save();
+    toast('Pagamento confirmado!');
+    renderAdmin();
+  }
+}
+
+function remover(id) {
+  if (!confirm('Remover este participante? Esta ação não pode ser desfeita.')) return;
+  S.participants = S.participants.filter(x => x.id !== id);
+  save();
+  toast('Participante removido');
+  renderAdmin();
+}
+
+function sortear(rifaId) {
+  const conf = rifaParts(rifaId).filter(p => p.status === 'confirmado');
+  if (!conf.length) { toast('Nenhum pagamento confirmado ainda'); return; }
+  const pool   = conf.flatMap(p => p.numeros.map(n => ({ nome: p.nome, n })));
+  const winner = pool[Math.floor(Math.random() * pool.length)];
+  alert(`🎉 Número sorteado: ${String(winner.n).padStart(2,'0')}\n\nGanhador: ${winner.nome}`);
+}
+
+function alterarSenha() {
+  const p1 = document.getElementById('np1')?.value || '';
+  const p2 = document.getElementById('np2')?.value || '';
+  if (p1.length < 4) { toast('Mínimo 4 caracteres'); return; }
+  if (p1 !== p2)     { toast('Senhas não coincidem'); return; }
+  S.adminPwd = btoa(unescape(encodeURIComponent(p1)));
+  save();
+  toast('Senha alterada!');
+  document.getElementById('np1').value = '';
+  document.getElementById('np2').value = '';
+}
+
+// ─── INIT ──────────────────────────────────────────────────────────────────────
+render();
+</script>
+</body>
+</html>
