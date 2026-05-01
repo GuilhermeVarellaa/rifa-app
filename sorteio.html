@@ -6,247 +6,53 @@
   <title>Sorteio ao Vivo</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
-      --gold: #f59e0b;
-      --gold-light: #fcd34d;
-      --gold-dark: #b45309;
-      --bg: #0f0f0f;
-      --bg2: #1a1a1a;
-      --bg3: #222;
-      --text: #f4f4f5;
-      --text2: #a1a1aa;
-      --radius: 12px;
-      --font: -apple-system, 'Segoe UI', sans-serif;
-      --font-mono: 'Courier New', monospace;
+      --gold: #f59e0b; --gold-light: #fcd34d; --gold-dark: #b45309;
+      --bg: #0f0f0f; --bg2: #1a1a1a; --bg3: #222;
+      --text: #f4f4f5; --text2: #a1a1aa;
+      --font: -apple-system, 'Segoe UI', sans-serif; --font-mono: 'Courier New', monospace;
     }
-
-    body {
-      font-family: var(--font);
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 24px 16px;
-      overflow: hidden;
-    }
-
-    /* PARTICLES */
+    body { font-family: var(--font); background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px 16px; overflow: hidden; }
     #particles { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
-
-    /* CONTENT */
     .wrap { position: relative; z-index: 1; width: 100%; max-width: 520px; text-align: center; }
-
-    h1 {
-      font-size: clamp(22px, 5vw, 32px);
-      font-weight: 700;
-      letter-spacing: -0.5px;
-      margin-bottom: 6px;
-      background: linear-gradient(135deg, var(--gold-light), var(--gold));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
+    h1 { font-size: clamp(22px,5vw,32px); font-weight: 700; margin-bottom: 6px; background: linear-gradient(135deg, var(--gold-light), var(--gold)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
     .subtitle { font-size: 14px; color: var(--text2); margin-bottom: 32px; }
-
-    /* NO DATA */
-    .no-data {
-      background: var(--bg2);
-      border: 0.5px solid #333;
-      border-radius: var(--radius);
-      padding: 32px 24px;
-      color: var(--text2);
-      font-size: 14px;
-      line-height: 1.6;
-    }
-    .no-data a { color: var(--gold); text-decoration: none; }
-
-    /* RIFA SELECTOR */
-    .rifa-selector {
-      display: flex;
-      gap: 8px;
-      justify-content: center;
-      flex-wrap: wrap;
-      margin-bottom: 28px;
-    }
-    .rifa-btn {
-      padding: 8px 16px;
-      border-radius: 20px;
-      border: 0.5px solid #444;
-      background: var(--bg2);
-      color: var(--text2);
-      font-size: 13px;
-      font-family: var(--font);
-      cursor: pointer;
-      transition: all 0.15s;
-    }
+    .rifa-selector { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-bottom: 28px; }
+    .rifa-btn { padding: 8px 16px; border-radius: 20px; border: 0.5px solid #444; background: var(--bg2); color: var(--text2); font-size: 13px; font-family: var(--font); cursor: pointer; transition: all 0.15s; }
     .rifa-btn:hover { border-color: var(--gold); color: var(--gold); }
     .rifa-btn.active { background: var(--gold-dark); border-color: var(--gold); color: #fff; font-weight: 500; }
-
-    /* SLOT MACHINE */
-    .slot-machine {
-      background: var(--bg2);
-      border: 0.5px solid #333;
-      border-radius: 20px;
-      padding: 28px 24px;
-      margin-bottom: 24px;
-      position: relative;
-      overflow: hidden;
-    }
-    .slot-machine::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      border-radius: 20px;
-      padding: 1px;
-      background: linear-gradient(135deg, var(--gold-dark), transparent, var(--gold-dark));
-      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-      -webkit-mask-composite: xor;
-      mask-composite: exclude;
-      opacity: 0.5;
-      pointer-events: none;
-    }
-
+    .slot-machine { background: var(--bg2); border: 0.5px solid #333; border-radius: 20px; padding: 28px 24px; margin-bottom: 24px; position: relative; overflow: hidden; }
+    .slot-machine::before { content:''; position:absolute; inset:0; border-radius:20px; padding:1px; background:linear-gradient(135deg,var(--gold-dark),transparent,var(--gold-dark)); -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0); -webkit-mask-composite:xor; mask-composite:exclude; opacity:0.5; pointer-events:none; }
     .slot-label { font-size: 12px; color: var(--text2); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 16px; }
-
-    /* DRUM */
-    .drum-wrap {
-      position: relative;
-      height: 120px;
-      overflow: hidden;
-      margin-bottom: 20px;
-      border-radius: 12px;
-    }
-    .drum-wrap::before,
-    .drum-wrap::after {
-      content: '';
-      position: absolute;
-      left: 0; right: 0;
-      height: 36px;
-      z-index: 2;
-      pointer-events: none;
-    }
-    .drum-wrap::before { top: 0; background: linear-gradient(to bottom, var(--bg2), transparent); }
-    .drum-wrap::after  { bottom: 0; background: linear-gradient(to top, var(--bg2), transparent); }
-
-    /* highlight line */
-    .drum-wrap .highlight {
-      position: absolute;
-      left: 50%; top: 50%;
-      transform: translate(-50%, -50%);
-      width: 90%;
-      height: 64px;
-      border-radius: 10px;
-      border: 1.5px solid var(--gold);
-      background: rgba(245,158,11,0.07);
-      z-index: 3;
-      pointer-events: none;
-    }
-
-    .drum {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      will-change: transform;
-    }
-    .drum-item {
-      height: 60px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: var(--font-mono);
-      font-size: 36px;
-      font-weight: 700;
-      color: var(--text2);
-      flex-shrink: 0;
-      width: 100%;
-      transition: color 0.1s;
-      letter-spacing: 3px;
-    }
+    .drum-wrap { position: relative; height: 120px; overflow: hidden; margin-bottom: 20px; border-radius: 12px; }
+    .drum-wrap::before, .drum-wrap::after { content:''; position:absolute; left:0; right:0; height:36px; z-index:2; pointer-events:none; }
+    .drum-wrap::before { top:0; background:linear-gradient(to bottom,var(--bg2),transparent); }
+    .drum-wrap::after  { bottom:0; background:linear-gradient(to top,var(--bg2),transparent); }
+    .drum-wrap .highlight { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); width:90%; height:64px; border-radius:10px; border:1.5px solid var(--gold); background:rgba(245,158,11,0.07); z-index:3; pointer-events:none; }
+    .drum { display:flex; flex-direction:column; align-items:center; will-change:transform; }
+    .drum-item { height:60px; display:flex; align-items:center; justify-content:center; font-family:var(--font-mono); font-size:36px; font-weight:700; color:var(--text2); flex-shrink:0; width:100%; letter-spacing:3px; }
     .drum-item.center { color: var(--gold-light); }
-
-    /* WINNER REVEAL */
-    .winner-box {
-      display: none;
-      padding: 20px;
-      border-radius: 14px;
-      background: linear-gradient(135deg, rgba(245,158,11,0.12), rgba(245,158,11,0.04));
-      border: 1px solid var(--gold-dark);
-      margin-bottom: 4px;
-      animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-    }
+    .winner-box { display:none; padding:20px; border-radius:14px; background:linear-gradient(135deg,rgba(245,158,11,0.12),rgba(245,158,11,0.04)); border:1px solid var(--gold-dark); margin-bottom:4px; animation:popIn 0.5s cubic-bezier(0.175,0.885,0.32,1.275) forwards; }
     .winner-box.show { display: block; }
-    @keyframes popIn {
-      from { transform: scale(0.85); opacity: 0; }
-      to   { transform: scale(1);    opacity: 1; }
-    }
-    .winner-num {
-      font-family: var(--font-mono);
-      font-size: clamp(48px, 12vw, 80px);
-      font-weight: 700;
-      color: var(--gold-light);
-      text-shadow: 0 0 40px rgba(252,211,77,0.5);
-      line-height: 1;
-      margin-bottom: 8px;
-    }
-    .winner-name {
-      font-size: clamp(20px, 5vw, 28px);
-      font-weight: 600;
-      color: var(--text);
-      margin-bottom: 4px;
-    }
-    .winner-wa { font-size: 14px; color: var(--text2); }
-
-    /* BUTTONS */
-    .btn-row { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
-    .btn {
-      padding: 12px 24px;
-      border-radius: 10px;
-      border: 0.5px solid #444;
-      background: var(--bg2);
-      color: var(--text);
-      font-size: 14px;
-      font-family: var(--font);
-      cursor: pointer;
-      transition: all 0.15s;
-    }
-    .btn:hover { border-color: #666; background: var(--bg3); }
-    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
-    .btn-gold {
-      background: linear-gradient(135deg, var(--gold-dark), var(--gold));
-      border-color: var(--gold);
-      color: #000;
-      font-weight: 600;
-      font-size: 15px;
-      padding: 14px 32px;
-    }
-    .btn-gold:hover { opacity: 0.9; }
-
-    /* PARTICIPANTS LIST */
-    .parts-toggle { font-size: 13px; color: var(--text2); cursor: pointer; margin-top: 20px; text-decoration: underline; text-underline-offset: 3px; }
-    .parts-toggle:hover { color: var(--text); }
-    .parts-list {
-      display: none;
-      margin-top: 14px;
-      background: var(--bg2);
-      border: 0.5px solid #333;
-      border-radius: var(--radius);
-      padding: 14px;
-      max-height: 240px;
-      overflow-y: auto;
-      text-align: left;
-    }
-    .parts-list.open { display: block; }
-    .part-row { display: flex; justify-content: space-between; align-items: flex-start; padding: 8px 0; border-bottom: 0.5px solid #2a2a2a; font-size: 13px; }
-    .part-row:last-child { border-bottom: none; }
-    .part-name { font-weight: 500; }
-    .part-nums { color: var(--text2); font-family: var(--font-mono); font-size: 12px; margin-top: 2px; }
-
-    /* CONFETTI canvas */
-    #confetti { position: fixed; inset: 0; pointer-events: none; z-index: 10; }
+    @keyframes popIn { from{transform:scale(0.85);opacity:0} to{transform:scale(1);opacity:1} }
+    .winner-num { font-family:var(--font-mono); font-size:clamp(48px,12vw,80px); font-weight:700; color:var(--gold-light); text-shadow:0 0 40px rgba(252,211,77,0.5); line-height:1; margin-bottom:8px; }
+    .winner-name { font-size:clamp(20px,5vw,28px); font-weight:600; color:var(--text); margin-bottom:4px; }
+    .winner-wa { font-size:14px; color:var(--text2); }
+    .btn-row { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+    .btn { padding:12px 24px; border-radius:10px; border:0.5px solid #444; background:var(--bg2); color:var(--text); font-size:14px; font-family:var(--font); cursor:pointer; transition:all 0.15s; }
+    .btn:hover { border-color:#666; background:var(--bg3); }
+    .btn:disabled { opacity:0.4; cursor:not-allowed; }
+    .btn-gold { background:linear-gradient(135deg,var(--gold-dark),var(--gold)); border-color:var(--gold); color:#000; font-weight:600; font-size:15px; padding:14px 32px; }
+    .btn-gold:hover { opacity:0.9; }
+    .parts-toggle { font-size:13px; color:var(--text2); cursor:pointer; margin-top:20px; text-decoration:underline; text-underline-offset:3px; }
+    .parts-list { display:none; margin-top:14px; background:var(--bg2); border:0.5px solid #333; border-radius:12px; padding:14px; max-height:240px; overflow-y:auto; text-align:left; }
+    .parts-list.open { display:block; }
+    .part-row { display:flex; justify-content:space-between; align-items:flex-start; padding:8px 0; border-bottom:0.5px solid #2a2a2a; font-size:13px; }
+    .part-row:last-child { border-bottom:none; }
+    .part-name { font-weight:500; }
+    .part-nums { color:var(--text2); font-family:var(--font-mono); font-size:12px; margin-top:2px; }
+    #confetti { position:fixed; inset:0; pointer-events:none; z-index:10; }
+    .loading { color: var(--text2); font-size: 14px; }
   </style>
 </head>
 <body>
@@ -255,68 +61,72 @@
 
 <div class="wrap">
   <h1>🎟 Sorteio ao Vivo</h1>
-  <p class="subtitle" id="subtitle">Carregando rifa...</p>
-  <div id="main"></div>
+  <p class="subtitle" id="subtitle">Carregando...</p>
+  <div id="main"><p class="loading">Conectando ao banco de dados...</p></div>
 </div>
 
-<script>
-// ─── LOAD DATA ────────────────────────────────────────────────────────────────
-const S = JSON.parse(localStorage.getItem('rifaApp_v1') || 'null');
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, doc, getDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-let selectedRifaId = S?.currentRifa || null;
+const firebaseConfig = {
+  apiKey: "AIzaSyAkKG1zAyxBRgGT-0XGhVPslF9pvV-BI84",
+  authDomain: "rifaapp-522b8.firebaseapp.com",
+  projectId: "rifaapp-522b8",
+  storageBucket: "rifaapp-522b8.firebasestorage.app",
+  messagingSenderId: "139042579193",
+  appId: "1:139042579193:web:8759a1c014b4708cf13828"
+};
+const app = initializeApp(firebaseConfig);
+const db  = getFirestore(app);
+
+let S = { rifas: [], currentRifa: null, participants: [] };
+let selectedRifaId = null;
 let rolling = false;
 let drumAnim = null;
 
-function getRifa(id) { return S?.rifas?.find(r => r.id === id); }
+async function loadData() {
+  const cfgSnap   = await getDoc(doc(db, 'app', 'config'));
+  if (cfgSnap.exists()) S.currentRifa = cfgSnap.data().currentRifa || null;
+  const rifasSnap = await getDocs(collection(db, 'rifas'));
+  S.rifas = rifasSnap.docs.map(d => ({ ...d.data(), _docId: d.id }));
+  const partsSnap = await getDocs(collection(db, 'participants'));
+  S.participants  = partsSnap.docs.map(d => ({ ...d.data(), _docId: d.id }));
+  selectedRifaId  = S.currentRifa || (S.rifas[0]?.id || null);
+}
 
 function getConfirmados(rifaId) {
-  return (S?.participants || [])
-    .filter(p => p.rifaId === rifaId && p.status === 'confirmado');
+  return S.participants.filter(p => p.rifaId === rifaId && p.status === 'confirmado');
 }
 
 function getPool(rifaId) {
-  return getConfirmados(rifaId)
-    .flatMap(p => p.numeros.map(n => ({ num: n, nome: p.nome, wa: p.wa })));
+  return getConfirmados(rifaId).flatMap(p => p.numeros.map(n => ({ num: n, nome: p.nome, wa: p.wa })));
 }
 
-// ─── RENDER ───────────────────────────────────────────────────────────────────
 function render() {
   const main = document.getElementById('main');
   const sub  = document.getElementById('subtitle');
-
-  if (!S || !S.rifas?.length) {
+  if (!S.rifas.length) {
     sub.textContent = '';
-    main.innerHTML = `<div class="no-data">
-      Nenhuma rifa encontrada. Acesse o <a href="index.html">painel da rifa</a>
-      no mesmo navegador para criar e gerenciar sua rifa.
-    </div>`;
+    main.innerHTML = `<p style="color:#666;font-size:14px;">Nenhuma rifa encontrada no banco de dados.</p>`;
     return;
   }
-
-  const rifa = getRifa(selectedRifaId) || S.rifas[0];
-  if (!selectedRifaId) selectedRifaId = rifa.id;
-
-  const pool = getPool(selectedRifaId);
-  const conf = getConfirmados(selectedRifaId);
-  sub.textContent = rifa.nome + ' · ' + conf.length + ' participante' + (conf.length !== 1 ? 's' : '') + ' confirmado' + (conf.length !== 1 ? 's' : '');
-
-  const rifaSelector = S.rifas.length > 1
-    ? `<div class="rifa-selector">
-        ${S.rifas.map(r => `
-          <button class="rifa-btn${r.id === selectedRifaId ? ' active' : ''}"
-            onclick="selectRifa(${r.id})">${r.nome}</button>`).join('')}
-       </div>` : '';
+  const rifa = S.rifas.find(r => r.id === selectedRifaId) || S.rifas[0];
+  selectedRifaId = rifa.id;
+  const conf = getConfirmados(rifa.id);
+  const pool = getPool(rifa.id);
+  sub.textContent = `${rifa.nome} · ${conf.length} participante${conf.length!==1?'s':''} confirmado${conf.length!==1?'s':''}`;
 
   main.innerHTML = `
-    ${rifaSelector}
+    ${S.rifas.length > 1 ? `<div class="rifa-selector">${S.rifas.map(r=>`
+      <button class="rifa-btn${r.id===selectedRifaId?' active':''}" onclick="selectRifa('${r.id}')">${r.nome}</button>`).join('')}
+    </div>` : ''}
 
     <div class="slot-machine">
       <div class="slot-label">número sorteado</div>
       <div class="drum-wrap">
         <div class="highlight"></div>
-        <div class="drum" id="drum">
-          ${buildDrumItems(pool)}
-        </div>
+        <div class="drum" id="drum"><div class="drum-item">--</div></div>
       </div>
       <div class="winner-box" id="winner-box">
         <div class="winner-num" id="w-num">--</div>
@@ -326,99 +136,54 @@ function render() {
     </div>
 
     <div class="btn-row">
-      <button class="btn btn-gold" id="btn-sortear" onclick="iniciarSorteio()"
-        ${pool.length === 0 ? 'disabled' : ''}>
-        ${pool.length === 0 ? 'Sem participantes confirmados' : '🎰 Sortear!'}
+      <button class="btn btn-gold" id="btn-sortear" onclick="iniciarSorteio()" ${pool.length===0?'disabled':''}>
+        ${pool.length===0 ? 'Sem participantes confirmados' : '🎰 Sortear!'}
       </button>
       <button class="btn" onclick="resetSorteio()">Resetar</button>
     </div>
 
-    ${pool.length === 0 ? '' : `
-    <div class="parts-toggle" onclick="toggleParts()">
+    ${pool.length ? `
+    <div class="parts-toggle" onclick="document.getElementById('parts-list').classList.toggle('open')">
       Ver todos os ${pool.length} números da urna ▾
     </div>
     <div class="parts-list" id="parts-list">
-      ${conf.map(p => `
+      ${conf.map(p=>`
         <div class="part-row">
           <div>
             <div class="part-name">${p.nome}</div>
-            <div class="part-nums">${p.numeros.map(n => String(n).padStart(2,'0')).join(', ')}</div>
+            <div class="part-nums">${p.numeros.map(n=>String(n).padStart(2,'0')).join(', ')}</div>
           </div>
-          <div style="font-size:12px;color:#666;">${p.numeros.length} cota${p.numeros.length > 1 ? 's' : ''}</div>
+          <div style="font-size:12px;color:#666;">${p.numeros.length} cota${p.numeros.length>1?'s':''}</div>
         </div>`).join('')}
-    </div>`}
+    </div>` : ''}
   `;
 }
 
-function buildDrumItems(pool, highlight = null) {
-  if (!pool.length) return '<div class="drum-item">--</div>';
-  // Build a tall list with random items for visual effect
-  const items = [];
-  for (let i = 0; i < 40; i++) {
-    const entry = pool[Math.floor(Math.random() * pool.length)];
-    const isCenter = highlight !== null && i === 20;
-    items.push(`<div class="drum-item${isCenter ? ' center' : ''}">${String(entry.num).padStart(2,'0')}</div>`);
-  }
-  return items.join('');
-}
+window.selectRifa = function(id) { selectedRifaId = id; render(); };
 
-function selectRifa(id) { selectedRifaId = id; render(); }
-function toggleParts() { document.getElementById('parts-list')?.classList.toggle('open'); }
-
-// ─── SORTEIO ──────────────────────────────────────────────────────────────────
-let winner = null;
-
-function iniciarSorteio() {
+window.iniciarSorteio = function() {
   if (rolling) return;
   const pool = getPool(selectedRifaId);
   if (!pool.length) return;
-
   rolling = true;
-  winner  = null;
-
-  // Hide previous winner
-  const wb = document.getElementById('winner-box');
-  if (wb) { wb.classList.remove('show'); }
+  document.getElementById('winner-box')?.classList.remove('show');
   document.getElementById('btn-sortear').disabled = true;
-
-  // Pick winner
   const picked = pool[Math.floor(Math.random() * pool.length)];
-
-  // Animate drum
-  const drum = document.getElementById('drum');
-  if (!drum) return;
-
-  // Phase 1: fast random spin
-  let phase = 0;
+  const drum   = document.getElementById('drum');
   const phases = [
-    { duration: 600,  interval: 60  },
-    { duration: 800,  interval: 80  },
-    { duration: 700,  interval: 110 },
-    { duration: 600,  interval: 160 },
-    { duration: 500,  interval: 240 },
-    { duration: 400,  interval: 360 },
+    {duration:600,interval:60},{duration:800,interval:80},{duration:700,interval:110},
+    {duration:600,interval:160},{duration:500,interval:240},{duration:400,interval:360}
   ];
-
-  let phaseStart = Date.now();
-  let lastSwap   = Date.now();
-
+  let phase = 0, phaseStart = Date.now(), lastSwap = Date.now();
   function tick() {
-    const now     = Date.now();
-    const elapsed = now - phaseStart;
-
-    if (elapsed > phases[phase].duration) {
+    const now = Date.now();
+    if (now - phaseStart > phases[phase].duration) {
       phase++;
-      if (phase >= phases.length) {
-        // Final frame — show winner
-        showWinner(drum, picked, pool);
-        return;
-      }
+      if (phase >= phases.length) { showWinner(drum, picked, pool); return; }
       phaseStart = now;
     }
-
     if (now - lastSwap > phases[phase].interval) {
       lastSwap = now;
-      // Pick random display number (not the winner yet)
       const fake = pool[Math.floor(Math.random() * pool.length)];
       drum.innerHTML = `
         <div class="drum-item" style="height:30px;"></div>
@@ -427,118 +192,92 @@ function iniciarSorteio() {
         <div class="drum-item">${String(pool[Math.floor(Math.random()*pool.length)].num).padStart(2,'0')}</div>
         <div class="drum-item" style="height:30px;"></div>`;
     }
-
     drumAnim = requestAnimationFrame(tick);
   }
-
   drumAnim = requestAnimationFrame(tick);
-}
+};
 
 function showWinner(drum, picked, pool) {
-  // Show winner in center
   drum.innerHTML = `
     <div class="drum-item" style="height:30px;"></div>
     <div class="drum-item">${String(pool[Math.floor(Math.random()*pool.length)].num).padStart(2,'0')}</div>
     <div class="drum-item center" style="font-size:40px;color:var(--gold-light);">${String(picked.num).padStart(2,'0')}</div>
     <div class="drum-item">${String(pool[Math.floor(Math.random()*pool.length)].num).padStart(2,'0')}</div>
     <div class="drum-item" style="height:30px;"></div>`;
-
-  // Reveal winner box
   setTimeout(() => {
-    const wb = document.getElementById('winner-box');
-    document.getElementById('w-num').textContent  = String(picked.num).padStart(2, '0');
+    document.getElementById('w-num').textContent  = String(picked.num).padStart(2,'0');
     document.getElementById('w-name').textContent = '🏆 ' + picked.nome;
     document.getElementById('w-wa').textContent   = picked.wa;
-    wb.classList.add('show');
+    document.getElementById('winner-box').classList.add('show');
     launchConfetti();
     rolling = false;
     document.getElementById('btn-sortear').disabled = true;
   }, 300);
 }
 
-function resetSorteio() {
+window.resetSorteio = function() {
   if (drumAnim) cancelAnimationFrame(drumAnim);
   rolling = false;
   render();
-}
+};
 
-// ─── CONFETTI ─────────────────────────────────────────────────────────────────
 function launchConfetti() {
   const canvas = document.getElementById('confetti');
-  const ctx    = canvas.getContext('2d');
-  canvas.width  = window.innerWidth;
-  canvas.height = window.innerHeight;
-
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth; canvas.height = window.innerHeight;
   const colors = ['#f59e0b','#fcd34d','#ffffff','#fbbf24','#d97706','#fff7ed'];
-  const pieces = Array.from({ length: 120 }, () => ({
-    x: Math.random() * canvas.width,
-    y: -20,
-    r: Math.random() * 7 + 3,
-    color: colors[Math.floor(Math.random() * colors.length)],
-    vx: (Math.random() - 0.5) * 4,
-    vy: Math.random() * 3 + 2,
-    spin: (Math.random() - 0.5) * 0.3,
-    angle: Math.random() * Math.PI * 2,
-    shape: Math.random() > 0.5 ? 'rect' : 'circle'
+  const pieces = Array.from({length:120},()=>({
+    x:Math.random()*canvas.width, y:-20,
+    r:Math.random()*7+3, color:colors[Math.floor(Math.random()*colors.length)],
+    vx:(Math.random()-0.5)*4, vy:Math.random()*3+2,
+    spin:(Math.random()-0.5)*0.3, angle:Math.random()*Math.PI*2,
+    shape:Math.random()>0.5?'rect':'circle'
   }));
-
-  let frame = 0;
+  let frame=0;
   function draw() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    let alive = false;
-    pieces.forEach(p => {
-      if (p.y > canvas.height + 20) return;
-      alive = true;
-      p.x += p.vx; p.y += p.vy; p.angle += p.spin; p.vy += 0.04;
-      ctx.save();
-      ctx.translate(p.x, p.y);
-      ctx.rotate(p.angle);
-      ctx.fillStyle = p.color;
-      ctx.globalAlpha = Math.max(0, 1 - (p.y / canvas.height));
-      if (p.shape === 'rect') ctx.fillRect(-p.r, -p.r / 2, p.r * 2, p.r);
-      else { ctx.beginPath(); ctx.arc(0, 0, p.r / 2, 0, Math.PI * 2); ctx.fill(); }
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    let alive=false;
+    pieces.forEach(p=>{
+      if(p.y>canvas.height+20) return; alive=true;
+      p.x+=p.vx; p.y+=p.vy; p.angle+=p.spin; p.vy+=0.04;
+      ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.angle);
+      ctx.fillStyle=p.color; ctx.globalAlpha=Math.max(0,1-(p.y/canvas.height));
+      if(p.shape==='rect') ctx.fillRect(-p.r,-p.r/2,p.r*2,p.r);
+      else { ctx.beginPath(); ctx.arc(0,0,p.r/2,0,Math.PI*2); ctx.fill(); }
       ctx.restore();
     });
-    if (alive && frame++ < 300) requestAnimationFrame(draw);
-    else ctx.clearRect(0, 0, canvas.width, canvas.height);
+    if(alive&&frame++<300) requestAnimationFrame(draw);
+    else ctx.clearRect(0,0,canvas.width,canvas.height);
   }
   draw();
 }
 
-// ─── BACKGROUND PARTICLES ────────────────────────────────────────────────────
-(function bgParticles() {
-  const canvas = document.getElementById('particles');
-  const ctx    = canvas.getContext('2d');
-  function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-  resize();
-  window.addEventListener('resize', resize);
-
-  const dots = Array.from({ length: 55 }, () => ({
-    x: Math.random() * canvas.width,
-    y: Math.random() * canvas.height,
-    r: Math.random() * 1.5 + 0.3,
-    vx: (Math.random() - 0.5) * 0.3,
-    vy: (Math.random() - 0.5) * 0.3,
-    a: Math.random() * 0.4 + 0.1
+// Particles background
+(function(){
+  const canvas=document.getElementById('particles');
+  const ctx=canvas.getContext('2d');
+  function resize(){canvas.width=window.innerWidth;canvas.height=window.innerHeight;}
+  resize(); window.addEventListener('resize',resize);
+  const dots=Array.from({length:55},()=>({
+    x:Math.random()*canvas.width, y:Math.random()*canvas.height,
+    r:Math.random()*1.5+0.3, vx:(Math.random()-0.5)*0.3, vy:(Math.random()-0.5)*0.3,
+    a:Math.random()*0.4+0.1
   }));
-
-  function drawBg() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    dots.forEach(d => {
-      d.x += d.vx; d.y += d.vy;
-      if (d.x < 0 || d.x > canvas.width)  d.vx *= -1;
-      if (d.y < 0 || d.y > canvas.height) d.vy *= -1;
-      ctx.beginPath();
-      ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(245,158,11,${d.a})`;
-      ctx.fill();
+  function drawBg(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    dots.forEach(d=>{
+      d.x+=d.vx; d.y+=d.vy;
+      if(d.x<0||d.x>canvas.width) d.vx*=-1;
+      if(d.y<0||d.y>canvas.height) d.vy*=-1;
+      ctx.beginPath(); ctx.arc(d.x,d.y,d.r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(245,158,11,${d.a})`; ctx.fill();
     });
     requestAnimationFrame(drawBg);
   }
   drawBg();
 })();
 
-// ─── INIT ─────────────────────────────────────────────────────────────────────
+await loadData();
 render();
 </script>
 </body>
